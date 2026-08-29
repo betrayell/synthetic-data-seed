@@ -4,10 +4,10 @@ raw_logs = [
     "2026-08-13 05:41:15 | WARNING | db-service | High query latency detected: 450ms.",
     "2026-08-13 05:42:01 | ERROR | auth-service | Invalid password attempt for user 'admin'.",
     "2026-08-13 05:43:10 | CRITICAL | api-gateway | Rate limit exceeded from IP: 192.168.1.50",
-    "Bozuk log satiri - ayristirilamaz data", # Hata: Seviye, servis ve zaman bilgisi yok (IndexError)
+    "Bozuk log satiri - ayristirilamaz data", # (IndexError)
     "2026-08-13 05:44:00 | DEBUG | auth-service | Token refreshed.",
     "2026-08-13 05:45:12 | ERROR | payment-service | Gateway timeout.",
-    "2026-08-13 | INFO | payment-service | Missing time part in timestamp" # Hata: Eksik timestamp
+    "2026-08-13 | INFO | payment-service | Missing time part in timestamp" 
 ]
 def parsed_logs(raw_logs, parse_logs, corrupted_logs, logs_per_services, log_level, metrics):
 
@@ -25,20 +25,16 @@ def parsed_logs(raw_logs, parse_logs, corrupted_logs, logs_per_services, log_lev
                 "message": process[3]
             }
 
-            # Geçerli logu listeye ekle
             parse_logs.append(data)
 
-            # Toplam ve geçerli log sayısı
             metrics["total_processed"] += 1
             metrics["valid_count"] += 1
 
-            # Log level sayacı
             if data.get("log_level") in log_level:
                 count = counter_metrics(data, metrics)
             else:
                 count = 0
 
-            # Service sayacı
             if data.get("service_name") in logs_per_services:
                 count = counter_logs_per_level(data, metrics)
 
@@ -48,7 +44,6 @@ def parsed_logs(raw_logs, parse_logs, corrupted_logs, logs_per_services, log_lev
 
         else:
 
-            # Hatalı log
             metrics["total_processed"] += 1
             metrics["corrupted_count"] += 1
 
@@ -74,7 +69,6 @@ def parse_line(line, errors):
         result[3].strip()
     )
 
-    # Timestamp Doğrulaması
     if (len(timestamp) != 19 or
             timestamp[4] != "-" or
             timestamp[7] != "-" or
@@ -86,7 +80,6 @@ def parse_line(line, errors):
             "(Expected: YYYY-MM-DD HH:MM:SS)"
         )
 
-    # Log Seviyesi Doğrulaması
     valid_levels = [
         "DEBUG",
         "INFO",
@@ -98,13 +91,11 @@ def parse_line(line, errors):
     if log_level not in valid_levels:
         errors.append(f"Invalid log level: {log_level}")
 
-    # Boş Metin Doğrulaması
     if not service_name or not message:
         errors.append(
             "The service name or message field cannot be empty."
         )
 
-    # Karar Bölümü
     if len(errors) > 0:
         return (False, errors, line)
 
@@ -137,10 +128,6 @@ def counter_logs_per_level(data, metrics):
     return metrics["logs_per_service"][service_name]
 
 
-# ----------------------------------
-# BAŞLANGIÇ VERİLERİ
-# ----------------------------------
-
 parse_logs = []
 corrupted_logs = []
 
@@ -160,7 +147,6 @@ logs_per_services = [
 ]
 
 
-# Sayaçların tutulduğu ana dictionary
 metrics = {
     "total_processed": 0,
     "valid_count": 0,
@@ -184,10 +170,6 @@ metrics = {
 }
 
 
-# ----------------------------------
-# FONKSİYONU ÇALIŞTIR
-# ----------------------------------
-
 result = parsed_logs(
     raw_logs,
     parse_logs,
@@ -200,9 +182,6 @@ result = parsed_logs(
 _, parse_logs, corrupted_logs, metrics = result
 
 
-# ----------------------------------
-# SONUÇLARI GÖR
-# ----------------------------------
 
 print("PARSED LOGS:")
 print(parse_logs)

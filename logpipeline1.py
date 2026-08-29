@@ -249,9 +249,6 @@ levels_with_logs = [level for level, count in metrics['logs_per_level'].items() 
 if levels_with_logs:
     print(f"  (No logs found for: {', '.join(levels_with_logs)})")
 
-# ============================================================
-# 🔧 Display Service Breakdown
-# ============================================================
 print(f"\n🔧 Logs by Service:")
 print("-" * 80)
 for service, count in metrics['logs_per_service'].items():
@@ -263,9 +260,6 @@ services_with_logs = [service for service, count in metrics['logs_per_service'].
 if services_with_logs:
     print(f"  (No logs found for: {', '.join(services_with_logs)})")
 
-# ============================================================
-# 🎯 Final Status
-# ============================================================
 print("\n" + "=" * 80)
 if metrics['corrupted_count'] == 0 and metrics['error_count'] == 0:
     print("✨ SUCCESS: All logs parsed without errors! ✨")

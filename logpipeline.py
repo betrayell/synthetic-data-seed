@@ -47,7 +47,6 @@ def parsed_logs(raw_logs):
 
 
 def parse_line(line):
-    """📌 Temiz tasarım: Basit, predictable"""
     result = line.split("|")
     if len(result) != 4:
         return (False, ["Column count must be 4"], line)
@@ -71,8 +70,6 @@ def parse_line(line):
     
     return (True, [timestamp, log_level, service_name, message], line)
 
-
-# ✅ Kullanım: temiz ve basit
 result = parsed_logs(raw_logs)
 print(f"Valid: {len(result['parsed'])}")
 print(f"Corrupted: {len(result['corrupted'])}")

@@ -14,7 +14,6 @@ raw_logs = [
 
 def parsed_logs(raw_logs, parse_logs, corputed_logs, logs_per_services, log_level):
 
-    # Sayaçları bir kere oluşturuyoruz.
     level_metrics = {
         "INFO": 0,
         "ERROR": 0,
@@ -36,7 +35,6 @@ def parsed_logs(raw_logs, parse_logs, corputed_logs, logs_per_services, log_leve
 
         is_valid, procces, line, errors = parse_line(line, errors)
 
-        # Log bozuksa
         if not is_valid:
             if line not in corputed_logs:
                 corputed_logs.append(line)
@@ -50,21 +48,18 @@ def parsed_logs(raw_logs, parse_logs, corputed_logs, logs_per_services, log_leve
             "message": procces[3]
         }
 
-        # Log level sayacı
         if data.get("log_level") in log_level:
             level_metrics = counter_metrics(
                 data,
                 level_metrics
             )
 
-        # Service sayacı
         if data.get("service_name") in logs_per_services:
             service_metrics = counter_logs_per_level(
                 data,
                 service_metrics
             )
 
-        # Geçerli logu listeye ekle
         parse_logs.append(data)
 
     return (
@@ -80,7 +75,6 @@ def parse_line(line, errors):
 
     result = line.split("|")
 
-    # Log tam olarak 4 parçadan oluşmalı
     if len(result) != 4:
         errors.append(
             "Log must contain exactly 4 fields."
@@ -100,7 +94,6 @@ def parse_line(line, errors):
         result[3].strip()
     )
 
-    # Timestamp doğrulaması
     try:
         datetime.strptime(
             timestamp,
@@ -113,7 +106,6 @@ def parse_line(line, errors):
             "(Expected: YYYY-MM-DD HH:MM:SS)"
         )
 
-    # Log seviyesi doğrulaması
     valid_levels = [
         "DEBUG",
         "INFO",
@@ -127,7 +119,6 @@ def parse_line(line, errors):
             f"Invalid log level: {log_level}"
         )
 
-    # Boş alan kontrolü
     if not service_name or not message:
         errors.append(
             "The service name or message field "
@@ -150,7 +141,7 @@ def parse_line(line, errors):
             errors
         )
 
-    # Hata yoksa geçerli
+
     return (
         True,
         processed,
@@ -181,9 +172,6 @@ def counter_logs_per_level(data, logs_per_service):
     return logs_per_service
 
 
-# --------------------------------------------------
-# PROGRAM
-# --------------------------------------------------
 
 parse_logs = []
 
@@ -214,9 +202,6 @@ Bool, parse_logs, corputed_logs, count_metric, count_logs_pers_level = parsed_lo
 )
 
 
-# --------------------------------------------------
-# SONUÇLAR
-# --------------------------------------------------
 
 print("İşlem başarılı:", Bool)
 
