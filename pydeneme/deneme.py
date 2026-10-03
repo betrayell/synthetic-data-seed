@@ -65,7 +65,7 @@ def controller(items: dict):
         else:
             if "@" not in email or "." not in email:
                 errors.append("Mail must contain '@' and '.'")
-            if email.startswith("@") or email.endswith("@") or email.startswith(".") or email.endswith("."):
+            if email.startswith(("@", ".")) or email.endswith(("@", ".")):
                 errors.append("Invalid email structure.")
 
 

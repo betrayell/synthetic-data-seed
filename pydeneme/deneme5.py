@@ -1,20 +1,11 @@
 from datetime import datetime
 
-raw_logs = [
-    "2026-08-13 05:40:12 | INFO | auth-service | User 'ozgan' logged in successfully.",
-    "2026-08-13 05:41:00 | ERROR | payment-service | Payment failed for order #1092. Reason: Insufficient funds.",
-    "2026-08-13 05:41:15 | WARNING | db-service | High query latency detected: 450ms.",
-    "2026-08-13 05:42:01 | ERROR | auth-service | Invalid password attempt for user 'admin'.",
-    "2026-08-13 05:43:10 | CRITICAL | api-gateway | Rate limit exceeded from IP: 192.168.1.50",
-    "Bozuk log satiri - ayristirilamaz data", # Hata: Seviye, servis ve zaman bilgisi yok (IndexError)
-    "2026-08-13 05:44:00 | DEBUG | auth-service | Token refreshed.",
-    "2026-08-13 05:45:12 | ERROR | payment-service | Gateway timeout.",
-    "2026-08-13 | INFO | payment-service | Missing time part in timestamp" # Hata: Eksik timestamp
-]
+import data
+
+raw_logs = data.raw_logs
 
 def parsed_logs(raw_logs, parse_logs, corputed_logs, logs_per_services, log_level):
 
-    # Sayaçları bir kere oluşturuyoruz.
     level_metrics = {
         "INFO": 0,
         "ERROR": 0,
@@ -80,7 +71,6 @@ def parse_line(line, errors):
 
     result = line.split("|")
 
-    # Log tam olarak 4 parçadan oluşmalı
     if len(result) != 4:
         errors.append(
             "Log must contain exactly 4 fields."
@@ -102,10 +92,10 @@ def parse_line(line, errors):
 
     # Timestamp doğrulaması
     try:
-        datetime.strptime(
-            timestamp,
-            "%Y-%m-%d %H:%M:%S"
-        )
+        datetime.datetime.strptime(
+    timestamp,
+    "%Y-%m-%d %H:%M:%S"
+).replace(tzinfo=datetime.timezone.utc)
 
     except ValueError:
         errors.append(
@@ -113,7 +103,6 @@ def parse_line(line, errors):
             "(Expected: YYYY-MM-DD HH:MM:SS)"
         )
 
-    # Log seviyesi doğrulaması
     valid_levels = [
         "DEBUG",
         "INFO",
@@ -127,7 +116,6 @@ def parse_line(line, errors):
             f"Invalid log level: {log_level}"
         )
 
-    # Boş alan kontrolü
     if not service_name or not message:
         errors.append(
             "The service name or message field "
@@ -181,10 +169,6 @@ def counter_logs_per_level(data, logs_per_service):
     return logs_per_service
 
 
-# --------------------------------------------------
-# PROGRAM
-# --------------------------------------------------
-
 parse_logs = []
 
 corputed_logs = []
@@ -214,24 +198,21 @@ Bool, parse_logs, corputed_logs, count_metric, count_logs_pers_level = parsed_lo
 )
 
 
-# --------------------------------------------------
-# SONUÇLAR
-# --------------------------------------------------
 
 print("İşlem başarılı:", Bool)
 
-print("\nGeçerli loglar:")
+print("\nacceseable logs:")
 for log in parse_logs:
     print(log)
 
-print("\nBozuk loglar:")
+print("\ncorrupted logs:")
 for log in corputed_logs:
     print(log)
 
-print("\nLog level istatistikleri:")
+print("\nLog level statistics:")
 for level, count in count_metric.items():
     print(f"{level}: {count}")
 
-print("\nServis istatistikleri:")
+print("\nService statistics:")
 for service, count in count_logs_pers_level.items():
     print(f"{service}: {count}")
